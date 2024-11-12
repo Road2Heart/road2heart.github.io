@@ -3,9 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PNG Image Viewer</title>
+  <title>Responsive PNG Image</title>
+  <style>
+    /* 设置图片自适应 */
+    img {
+      width: 100%; /* 图片宽度占满屏幕 */
+      height: auto; /* 保持图片比例 */
+      display: block; /* 移除默认的 inline 样式 */
+    }
+
+    /* 移除页面默认的空白间距 */
+    body {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 </head>
 <body>
-  <img src="image.png" alt="My PNG Image">
+  <img src="image.png" alt="My Responsive PNG Image">
 </body>
 </html>
