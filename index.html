@@ -3,23 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>小郑的导航</title>
+  <title>Interactive Game</title>
   <style>
-    /* 设置图片自适应 */
-    img {
-      width: 100%; /* 图片宽度占满屏幕 */
-      height: auto; /* 保持图片比例 */
-      display: block; /* 移除默认的 inline 样式 */
-    }
-
-    /* 移除页面默认的空白间距 */
+    /* 全局样式 */
     body {
       margin: 0;
       padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #4c6ef5, #15aabf);
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    /* 游戏容器 */
+    #game-container {
+      width: 90%;
+      max-width: 800px;
+      height: 90%;
+      max-height: 600px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* 动态对象 */
+    .game-item {
+      width: 50px;
+      height: 50px;
+      background: #f03e3e;
+      border-radius: 50%;
+      position: absolute;
+      animation: float 4s infinite ease-in-out;
+    }
+
+    /* 动态浮动效果 */
+    @keyframes float {
+      0% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+      100% {
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
-  <img src="Navigation.png" alt="My Responsive PNG Image">
+  <div id="game-container">
+    <!-- 动态内容由 JavaScript 添加 -->
+  </div>
+
+  <script>
+    // 获取容器
+    const container = document.getElementById('game-container');
+
+    // 生成动态对象
+    function createGameItem() {
+      const item = document.createElement('div');
+      item.classList.add('game-item');
+
+      // 随机位置
+      const x = Math.random() * 100;
+      const y = Math.random() * 100;
+
+      item.style.left = `${x}%`;
+      item.style.top = `${y}%`;
+
+      // 点击事件
+      item.addEventListener('click', () => {
+        item.remove(); // 点击后移除对象
+        alert('You clicked the item!');
+      });
+
+      container.appendChild(item);
+    }
+
+    // 周期性生成对象
+    setInterval(createGameItem, 1000);
+  </script>
 </body>
 </html>
