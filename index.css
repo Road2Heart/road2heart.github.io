@@ -1,8 +1,0 @@
-body {
-  margin: 0;
-  overflow: hidden; /* 隐藏滚动条 */
-}
-
-canvas {
-  display: block; /* 全屏显示画布 */
-}
