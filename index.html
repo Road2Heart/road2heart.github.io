@@ -3,23 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Responsive PNG Image</title>
+  <title>Animated Navigation</title>
   <style>
-    /* 设置图片自适应 */
-    img {
-      width: 100%; /* 图片宽度占满屏幕 */
-      height: auto; /* 保持图片比例 */
-      display: block; /* 移除默认的 inline 样式 */
-    }
-
-    /* 移除页面默认的空白间距 */
+    /* 全局样式 */
     body {
       margin: 0;
       padding: 0;
+      font-family: Arial, sans-serif;
+      overflow: hidden; /* 禁止页面滚动 */
+    }
+
+    /* 导航菜单容器 */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: -250px; /* 初始隐藏 */
+      width: 250px;
+      height: 100vh;
+      background-color: #34495e;
+      color: white;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease; /* 平滑过渡动画 */
+    }
+
+    /* 导航菜单展开 */
+    .nav.active {
+      left: 0; /* 滑出到可见区域 */
+    }
+
+    /* 菜单项 */
+    .nav ul {
+      list-style: none;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .nav ul li {
+      margin: 15px 0;
+    }
+
+    .nav ul li a {
+      text-decoration: none;
+      color: white;
+      font-size: 18px;
+    }
+
+    .nav ul li a:hover {
+      color: #1abc9c;
+    }
+
+    /* 菜单按钮 */
+    .menu-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      background-color: #1abc9c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    /* 内容区域 */
+    .content {
+      margin: 0;
+      padding: 20px;
+      font-size: 18px;
     }
   </style>
 </head>
 <body>
-  <img src="image.png" alt="My Responsive PNG Image">
+  <!-- 导航按钮 -->
+  <button class="menu-btn">&#9776;</button>
+
+  <!-- 导航菜单 -->
+  <nav class="nav">
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- 主内容 -->
+  <div class="content">
+    <h1>Welcome to the Page</h1>
+    <p>Click the menu button to toggle the navigation.</p>
+  </div>
+
+  <script>
+    // 获取导航菜单和按钮
+    const nav = document.querySelector('.nav');
+    const menuBtn = document.querySelector('.menu-btn');
+
+    // 切换菜单的展开和隐藏
+    menuBtn.addEventListener('click', () => {
+      nav.classList.toggle('active');
+    });
+  </script>
 </body>
 </html>
