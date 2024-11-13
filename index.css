@@ -1,86 +1,169 @@
-body { background: #ccc; padding: 20px; font: 14px/100px Arial; }
+* { box-sizing: border-box; }
 
-
-.view {
-
-  background: #FFF;
-  width: 1000px;
-  height: 500px;
-  box-shadow: 0 1px 3px #999;
-  overflow: hidden;
-  position: relative;
-  margin: 0 auto;
-
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Avenir Next', Avenir, sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  color: #555;
 }
 
-.map {
-
-  background-image: url("map.gif");
-  background-repeat: no-repeat;
-  background-position: 0 0;
-  width: 1484px;
-  height: 1484px;
-  z-index: 1;
-  position: absolute;
-  left: -300px;
-  top: -500px;
-
-}
-
-b {
-  width: 100px;
-  height: 100px;
+canvas {
+  cursor: move;
   display: block;
-  border-radius: 100px;
-  background: #333;
-  color: #FFF;
-  text-align: center;
-  cursor: pointer;
   position: absolute;
-  z-index: 2;
-}
-section b {
-  width: 70px;
-  height: 70px;
-  line-height: 70px;
-  background: #666;
-  opacity: 0;
-  margin-top: -20px;
-  transition: opacity 0.15s, margin 0.15s;
-}
-section b.show {
-  opacity: 1;
-  margin-top: 0;
-}
-b:hover {
-  background: #ff3333;
+  max-width: 100%;
+  left: 0;
+  top: 0;
 }
 
-b.home {
-  left: 770px;
-  top: 650px;
+.is-cub-hovered,
+.is-cub-hovered canvas {
+  cursor: -webkit-grab;
+  cursor: grab;
 }
-b.stories {
-  left: 450px;
-  top: 850px;
+
+.is-cub-dragging,
+.is-cub-dragging canvas {
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
 }
-.s_stories b:nth-child(1){
-  left: 330px;
-  top: 850px;
-  transition-delay: 0s;
+
+.instruction {
+  padding: 0 10px;
+  text-align: center;
+  position: absolute;
+  width: 100%;
+  padding-bottom: 40px;
 }
-.s_stories b:nth-child(2){
-  left: 370px;
-  top: 950px;
-  transition-delay: 0.15s;
+
+.button {
+  font-family: 'Avenir Next', Avenir, sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  padding: 5px 15px;
+  margin: 10px;
+  background: #BBB;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
 }
-.s_stories b:nth-child(3){
-  left: 480px;
-  top: 990px;
-  transition-delay: 0.3s;
+
+.button:hover {
+  background: #09F;
 }
-.s_stories b:nth-child(4){
-  left: 580px;
-  top: 930px;
-  transition-delay: 0.45s;
+
+.top-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
 }
+
+.level-select-button {
+  position: relative;
+  z-index: 2; /* above canvas */
+}
+
+.next-level-button {
+  position: absolute;
+  left: 50%;
+  -webkit-transform: translateX(-110px) scale(0.5);
+  transform: translateX(-110px) scale(0.5);
+  opacity: 0;
+  background: #09F;
+  width: 200px;
+  height: 80px;
+  pointer-events: none;
+  -webkit-transition: -webkit-transform 0.2s, opacity 0.2s;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.next-level-button:hover {
+  background: #2BF;
+}
+
+.next-level-button.is-open {
+  display: inline-block;
+  pointer-events: auto;
+  -webkit-transform: translateX(-110px) scale(1);
+  transform: translate(-110px) scale(1);
+  opacity: 1;
+}
+
+/* ---- level list ---- */
+
+.level-list {
+  position: absolute;
+  background: #EEE;
+  width: 100%;
+  min-height: 100%;
+  left: 0;
+  top: 0;
+  margin: 0;
+  list-style: none;
+  padding: 10px;
+  z-index: 3; /* above canvas, level select button */
+  left: -100%;
+  transition: left 0.2s;
+}
+
+.level-list.is-open {
+  left: 0;
+}
+
+.level-list__item {
+  display: inline-block;
+  background: #DDD;
+  margin: 5px;
+  padding: 10px;
+  width: 80px;
+  height: 80px;
+  text-align: center;
+  border-radius: 10px;
+  position: relative;
+}
+
+.level-list__item:hover {
+  color: #09F;
+  cursor: pointer;
+  background: white;
+}
+
+.level-list__item.is-playing {
+  background: #09F;
+  color: white;
+}
+
+.level-list__item__number {
+  display: block;
+  font-size: 30px;
+  line-height: 35px;
+}
+
+.level-list__item__blurb {
+  display: block;
+  font-size: 16px;
+}
+
+.level-list__item__check {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 30px;
+  line-height: 30px;
+  background: #555;
+  border-radius: 15px;
+  color: white;
+  display: none;
+}
+
+.level-list__item.did-complete .level-list__item__check {
+  display: block;
+}
+
+/* ---- level pres ---- */
+
+.levels { display: none; }
