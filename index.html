@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maze with Route</title>
+  <title>Maze Map</title>
   <style>
     body {
       margin: 0;
@@ -19,129 +19,89 @@
   <canvas id="maze"></canvas>
 
   <script>
-    // 获取画布和上下文
-    const canvas = document.getElementById('maze');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.getElementById("maze");
+    const ctx = canvas.getContext("2d");
 
     // 设置画布尺寸为全屏
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
     // 迷宫参数
-    const cols = 20; // 迷宫列数
-    const rows = 15; // 迷宫行数
+    const cols = 21; // 列数 (奇数)
+    const rows = 15; // 行数 (奇数)
     const cellSize = Math.min(canvas.width / cols, canvas.height / rows); // 单元格大小
 
-    // 路径数组 (模拟迷宫路线)
-    const path = [
-      { x: 0, y: 0 },
-      { x: 1, y: 0 },
-      { x: 2, y: 0 },
-      { x: 2, y: 1 },
-      { x: 2, y: 2 },
-      { x: 3, y: 2 },
-      { x: 4, y: 2 },
-      { x: 4, y: 3 },
-      { x: 4, y: 4 },
-      { x: 5, y: 4 },
-      { x: 6, y: 4 },
-      { x: 6, y: 5 },
-      { x: 6, y: 6 },
-      { x: 7, y: 6 },
-      { x: 8, y: 6 },
-      { x: 8, y: 7 },
-      { x: 9, y: 7 }
-    ];
+    // 初始化迷宫网格 (1表示墙，0表示通道)
+    const maze = Array.from({ length: rows }, () =>
+      Array.from({ length: cols }, () => 1)
+    );
 
-    // 绘制迷宫
-    function drawMaze() {
-      ctx.fillStyle = '#e9ecef';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // 起点和终点
+    const start = { x: 1, y: 1 }; // 起点
+    const end = { x: cols - 2, y: rows - 2 }; // 终点
 
-      ctx.strokeStyle = '#adb5bd';
-      ctx.lineWidth = 2;
+    // 生成迷宫
+    function generateMaze(x, y) {
+      maze[y][x] = 0; // 当前单元格设为通道
 
-      // 绘制网格
-      for (let i = 0; i <= cols; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i * cellSize, 0);
-        ctx.lineTo(i * cellSize, rows * cellSize);
-        ctx.stroke();
-      }
+      // 随机方向数组
+      const directions = [
+        [0, -2], // 上
+        [2, 0],  // 右
+        [0, 2],  // 下
+        [-2, 0], // 左
+      ].sort(() => Math.random() - 0.5);
 
-      for (let i = 0; i <= rows; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, i * cellSize);
-        ctx.lineTo(cols * cellSize, i * cellSize);
-        ctx.stroke();
+      // 遍历每个方向
+      for (const [dx, dy] of directions) {
+        const nx = x + dx; // 下一个单元格的x坐标
+        const ny = y + dy; // 下一个单元格的y坐标
+
+        // 检查下一个单元格是否在迷宫范围内且是墙
+        if (nx > 0 && nx < cols && ny > 0 && ny < rows && maze[ny][nx] === 1) {
+          maze[y + dy / 2][x + dx / 2] = 0; // 打通墙壁
+          generateMaze(nx, ny); // 递归生成迷宫
+        }
       }
     }
 
-    // 绘制路线
-    function drawRoute() {
-      ctx.beginPath();
-      ctx.strokeStyle = '#1c7ed6'; // 蓝色路线
-      ctx.lineWidth = 4;
-      ctx.lineJoin = 'round';
+    generateMaze(start.x, start.y);
 
-      // 遍历路径点
-      for (let i = 0; i < path.length; i++) {
-        const point = path[i];
-        const x = point.x * cellSize + cellSize / 2;
-        const y = point.y * cellSize + cellSize / 2;
-
-        if (i === 0) {
-          ctx.moveTo(x, y); // 起点
-        } else {
-          ctx.lineTo(x, y); // 连线到下一个点
+    // 绘制迷宫
+    function drawMaze() {
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          ctx.fillStyle = maze[y][x] === 1 ? "#343a40" : "#f8f9fa"; // 墙: 深灰，通道: 浅灰
+          ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
         }
-      }
-
-      ctx.stroke();
-
-      // 绘制路径点
-      for (let i = 0; i < path.length; i++) {
-        const point = path[i];
-        const x = point.x * cellSize + cellSize / 2;
-        const y = point.y * cellSize + cellSize / 2;
-
-        ctx.beginPath();
-        ctx.fillStyle = '#1c7ed6';
-        ctx.arc(x, y, 5, 0, Math.PI * 2);
-        ctx.fill();
       }
     }
 
     // 绘制起点
     function drawStart() {
-      const startX = path[0].x * cellSize;
-      const startY = path[0].y * cellSize;
-
-      ctx.fillStyle = '#1c7ed6';
+      ctx.fillStyle = "#1c7ed6"; // 蓝色
       ctx.font = `${cellSize / 2}px Arial`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('小郑', startX + cellSize / 2, startY + cellSize / 2);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("小郑", start.x * cellSize + cellSize / 2, start.y * cellSize + cellSize / 2);
     }
 
     // 绘制终点爱心
     function drawEnd() {
-      const end = path[path.length - 1];
       const x = end.x * cellSize + cellSize / 2;
       const y = end.y * cellSize + cellSize / 2;
 
-      ctx.fillStyle = '#ff6b6b';
+      ctx.fillStyle = "#ff6b6b"; // 红色
       ctx.beginPath();
-      ctx.moveTo(x, y); // 爱心尖点
+      ctx.moveTo(x, y);
       ctx.bezierCurveTo(x - 10, y - 10, x - 20, y + 10, x, y + 20);
       ctx.bezierCurveTo(x + 20, y + 10, x + 10, y - 10, x, y);
       ctx.fill();
     }
 
-    // 绘制整个迷宫和路径
+    // 绘制完整迷宫
     function draw() {
       drawMaze();
-      drawRoute();
       drawStart();
       drawEnd();
     }
