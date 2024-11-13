@@ -52,4 +52,42 @@
       ctx.lineWidth = 1;
 
       for (let x = 0; x <= mapWidth; x += gridSize) {
-     
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, mapHeight);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y <= mapHeight; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(mapWidth, y);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    // 动画更新函数
+    function animateMap() {
+      // 模拟动画效果 (缩放和平移)
+      scale += 0.01;
+      offsetX -= 5 * scale;
+      offsetY -= 5 * scale;
+
+      if (scale > 2) {
+        scale = 1;
+        offsetX = -500;
+        offsetY = -500;
+      }
+
+      drawMap();
+      requestAnimationFrame(animateMap);
+    }
+
+    // 初始化动画
+    drawMap();
+    animateMap();
+  </script>
+</body>
+</html>
