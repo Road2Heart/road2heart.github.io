@@ -22,9 +22,11 @@
     const canvas = document.getElementById("maze");
     const ctx = canvas.getContext("2d");
 
-    // 设置画布尺寸为全屏
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // 设置画布尺寸为 9:19.5 的宽高比
+    const mapWidth = window.innerWidth;
+    const mapHeight = mapWidth * (19.5 / 9);
+    canvas.width = mapWidth;
+    canvas.height = mapHeight;
 
     // 迷宫参数
     const cols = 21; // 列数 (奇数)
@@ -80,7 +82,7 @@
     // 绘制起点
     function drawStart() {
       ctx.fillStyle = "#1c7ed6"; // 蓝色
-      ctx.font = `${cellSize / 2}px Arial`;
+      ctx.font = `${cellSize}px Arial`; // 增大字体大小
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText("小郑", start.x * cellSize + cellSize / 2, start.y * cellSize + cellSize / 2);
