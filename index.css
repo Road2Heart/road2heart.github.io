@@ -1,0 +1,86 @@
+body { background: #ccc; padding: 20px; font: 14px/100px Arial; }
+
+
+.view {
+
+  background: #FFF;
+  width: 1000px;
+  height: 500px;
+  box-shadow: 0 1px 3px #999;
+  overflow: hidden;
+  position: relative;
+  margin: 0 auto;
+
+}
+
+.map {
+
+  background-image: url("https://i.imgur.com/s2UeDfZ.gif");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  width: 1484px;
+  height: 1484px;
+  z-index: 1;
+  position: absolute;
+  left: -300px;
+  top: -500px;
+
+}
+
+b {
+  width: 100px;
+  height: 100px;
+  display: block;
+  border-radius: 100px;
+  background: #333;
+  color: #FFF;
+  text-align: center;
+  cursor: pointer;
+  position: absolute;
+  z-index: 2;
+}
+section b {
+  width: 70px;
+  height: 70px;
+  line-height: 70px;
+  background: #666;
+  opacity: 0;
+  margin-top: -20px;
+  transition: opacity 0.15s, margin 0.15s;
+}
+section b.show {
+  opacity: 1;
+  margin-top: 0;
+}
+b:hover {
+  background: #ff3333;
+}
+
+b.home {
+  left: 770px;
+  top: 650px;
+}
+b.stories {
+  left: 450px;
+  top: 850px;
+}
+.s_stories b:nth-child(1){
+  left: 330px;
+  top: 850px;
+  transition-delay: 0s;
+}
+.s_stories b:nth-child(2){
+  left: 370px;
+  top: 950px;
+  transition-delay: 0.15s;
+}
+.s_stories b:nth-child(3){
+  left: 480px;
+  top: 990px;
+  transition-delay: 0.3s;
+}
+.s_stories b:nth-child(4){
+  left: 580px;
+  top: 930px;
+  transition-delay: 0.45s;
+}
