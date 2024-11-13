@@ -3,14 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive Map</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="style.css" />
+  <title>Responsive PNG Image</title>
+  <style>
+    /* 设置图片自适应 */
+    img {
+      width: 100%; /* 图片宽度占满屏幕 */
+      height: auto; /* 保持图片比例 */
+      display: block; /* 移除默认的 inline 样式 */
+    }
+
+    /* 移除页面默认的空白间距 */
+    body {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 </head>
 <body>
-  <h1>Interactive Map Example</h1>
-  <div id="map"></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="script.js"></script>
+  <img src="Navigation.png" alt="My Responsive PNG Image">
 </body>
 </html>
