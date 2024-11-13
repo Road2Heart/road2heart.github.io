@@ -3,116 +3,150 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Map with Route</title>
+  <title>Maze with Route</title>
   <style>
     body {
       margin: 0;
-      overflow: hidden; /* 隐藏滚动条 */
+      overflow: hidden;
     }
 
     canvas {
-      display: block; /* 全屏显示画布 */
+      display: block;
     }
   </style>
 </head>
 <body>
-  <canvas id="map"></canvas>
+  <canvas id="maze"></canvas>
 
   <script>
     // 获取画布和上下文
-    const canvas = document.getElementById('map');
+    const canvas = document.getElementById('maze');
     const ctx = canvas.getContext('2d');
 
     // 设置画布尺寸为全屏
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    // 模拟地图数据 (网格)
-    const gridSize = 50; // 网格的大小
-    const mapWidth = 2000; // 地图的宽度
-    const mapHeight = 2000; // 地图的高度
+    // 迷宫参数
+    const cols = 20; // 迷宫列数
+    const rows = 15; // 迷宫行数
+    const cellSize = Math.min(canvas.width / cols, canvas.height / rows); // 单元格大小
 
-    // 偏移量 (地图初始位置)
-    const offsetX = -500; // x 轴偏移
-    const offsetY = -500; // y 轴偏移
-    const scale = 1; // 地图缩放比例
-
-    // 路线数据 (在网格中的坐标点)
-    const route = [
-      { x: 100, y: 100 },
-      { x: 300, y: 150 },
-      { x: 500, y: 400 },
-      { x: 800, y: 600 },
-      { x: 1000, y: 800 },
+    // 路径数组 (模拟迷宫路线)
+    const path = [
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 2, y: 0 },
+      { x: 2, y: 1 },
+      { x: 2, y: 2 },
+      { x: 3, y: 2 },
+      { x: 4, y: 2 },
+      { x: 4, y: 3 },
+      { x: 4, y: 4 },
+      { x: 5, y: 4 },
+      { x: 6, y: 4 },
+      { x: 6, y: 5 },
+      { x: 6, y: 6 },
+      { x: 7, y: 6 },
+      { x: 8, y: 6 },
+      { x: 8, y: 7 },
+      { x: 9, y: 7 }
     ];
 
-    // 绘制地图
-    function drawMap() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); // 清除画布
-      ctx.save();
+    // 绘制迷宫
+    function drawMaze() {
+      ctx.fillStyle = '#e9ecef';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 平移和缩放
-      ctx.translate(offsetX, offsetY);
-      ctx.scale(scale, scale);
+      ctx.strokeStyle = '#adb5bd';
+      ctx.lineWidth = 2;
 
-      // 绘制地图背景
-      ctx.fillStyle = "#e9ecef";
-      ctx.fillRect(0, 0, mapWidth, mapHeight);
-
-      // 绘制网格线
-      ctx.strokeStyle = "#adb5bd";
-      ctx.lineWidth = 1;
-
-      for (let x = 0; x <= mapWidth; x += gridSize) {
+      // 绘制网格
+      for (let i = 0; i <= cols; i++) {
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, mapHeight);
+        ctx.moveTo(i * cellSize, 0);
+        ctx.lineTo(i * cellSize, rows * cellSize);
         ctx.stroke();
       }
 
-      for (let y = 0; y <= mapHeight; y += gridSize) {
+      for (let i = 0; i <= rows; i++) {
         ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(mapWidth, y);
+        ctx.moveTo(0, i * cellSize);
+        ctx.lineTo(cols * cellSize, i * cellSize);
         ctx.stroke();
       }
-
-      // 绘制路线
-      drawRoute();
-
-      ctx.restore();
     }
 
-    // 绘制路线函数
+    // 绘制路线
     function drawRoute() {
       ctx.beginPath();
-      ctx.strokeStyle = "#ff6b6b"; // 路线颜色
-      ctx.lineWidth = 3;
-      ctx.lineJoin = "round";
-      ctx.lineCap = "round";
+      ctx.strokeStyle = '#1c7ed6'; // 蓝色路线
+      ctx.lineWidth = 4;
+      ctx.lineJoin = 'round';
 
-      // 遍历路线点，绘制曲线路径
-      for (let i = 0; i < route.length; i++) {
-        const point = route[i];
+      // 遍历路径点
+      for (let i = 0; i < path.length; i++) {
+        const point = path[i];
+        const x = point.x * cellSize + cellSize / 2;
+        const y = point.y * cellSize + cellSize / 2;
+
         if (i === 0) {
-          ctx.moveTo(point.x, point.y); // 路径起点
+          ctx.moveTo(x, y); // 起点
         } else {
-          ctx.lineTo(point.x, point.y); // 连线到下一个点
+          ctx.lineTo(x, y); // 连线到下一个点
         }
       }
+
       ctx.stroke();
 
-      // 在每个路径点绘制标记
-      ctx.fillStyle = "#1c7ed6"; // 路径点颜色
-      for (const point of route) {
+      // 绘制路径点
+      for (let i = 0; i < path.length; i++) {
+        const point = path[i];
+        const x = point.x * cellSize + cellSize / 2;
+        const y = point.y * cellSize + cellSize / 2;
+
         ctx.beginPath();
-        ctx.arc(point.x, point.y, 5, 0, Math.PI * 2); // 路径点圆形
+        ctx.fillStyle = '#1c7ed6';
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // 调用绘制地图函数
-    drawMap();
+    // 绘制起点
+    function drawStart() {
+      const startX = path[0].x * cellSize;
+      const startY = path[0].y * cellSize;
+
+      ctx.fillStyle = '#1c7ed6';
+      ctx.font = `${cellSize / 2}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('小郑', startX + cellSize / 2, startY + cellSize / 2);
+    }
+
+    // 绘制终点爱心
+    function drawEnd() {
+      const end = path[path.length - 1];
+      const x = end.x * cellSize + cellSize / 2;
+      const y = end.y * cellSize + cellSize / 2;
+
+      ctx.fillStyle = '#ff6b6b';
+      ctx.beginPath();
+      ctx.moveTo(x, y); // 爱心尖点
+      ctx.bezierCurveTo(x - 10, y - 10, x - 20, y + 10, x, y + 20);
+      ctx.bezierCurveTo(x + 20, y + 10, x + 10, y - 10, x, y);
+      ctx.fill();
+    }
+
+    // 绘制整个迷宫和路径
+    function draw() {
+      drawMaze();
+      drawRoute();
+      drawStart();
+      drawEnd();
+    }
+
+    draw();
   </script>
 </body>
 </html>
