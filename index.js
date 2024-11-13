@@ -1,19 +1,29 @@
+// 获取画布和上下文
 const canvas = document.getElementById('map');
 const ctx = canvas.getContext('2d');
 
-// 设置画布全屏
+// 设置画布尺寸为全屏
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 // 模拟地图数据 (网格)
-const gridSize = 50; // 网格大小
-const mapWidth = 2000; // 地图宽度
-const mapHeight = 2000; // 地图高度
+const gridSize = 50; // 网格的大小
+const mapWidth = 2000; // 地图的宽度
+const mapHeight = 2000; // 地图的高度
 
-// 初始地图状态
-let offsetX = -500; // 地图的初始偏移量 (x 轴)
-let offsetY = -500; // 地图的初始偏移量 (y 轴)
-let scale = 1; // 初始缩放
+// 偏移量 (地图初始位置)
+const offsetX = -500; // x 轴偏移
+const offsetY = -500; // y 轴偏移
+const scale = 1; // 地图缩放比例
+
+// 路线数据 (在网格中的坐标点)
+const route = [
+  { x: 100, y: 100 },
+  { x: 300, y: 150 },
+  { x: 500, y: 400 },
+  { x: 800, y: 600 },
+  { x: 1000, y: 800 },
+];
 
 // 绘制地图
 function drawMap() {
@@ -21,16 +31,17 @@ function drawMap() {
   ctx.save();
 
   // 平移和缩放
-  ctx.translate(offsetX, offsetY); // 偏移
-  ctx.scale(scale, scale); // 缩放
+  ctx.translate(offsetX, offsetY);
+  ctx.scale(scale, scale);
 
-  // 绘制网格
-  ctx.fillStyle = "#e9ecef"; // 背景色
-  ctx.fillRect(0, 0, mapWidth, mapHeight); // 绘制地图背景
-  ctx.strokeStyle = "#adb5bd"; // 网格颜色
+  // 绘制地图背景
+  ctx.fillStyle = "#e9ecef";
+  ctx.fillRect(0, 0, mapWidth, mapHeight);
+
+  // 绘制网格线
+  ctx.strokeStyle = "#adb5bd";
   ctx.lineWidth = 1;
 
-  // 绘制垂直网格线
   for (let x = 0; x <= mapWidth; x += gridSize) {
     ctx.beginPath();
     ctx.moveTo(x, 0);
@@ -38,7 +49,6 @@ function drawMap() {
     ctx.stroke();
   }
 
-  // 绘制水平网格线
   for (let y = 0; y <= mapHeight; y += gridSize) {
     ctx.beginPath();
     ctx.moveTo(0, y);
@@ -46,27 +56,39 @@ function drawMap() {
     ctx.stroke();
   }
 
-  ctx.restore(); // 恢复上下文状态
+  // 绘制路线
+  drawRoute();
+
+  ctx.restore();
 }
 
-// 动画更新函数
-function animateMap() {
-  // 模拟动画效果 (缩放和平移)
-  scale += 0.01; // 每帧缩放比例增加
-  offsetX -= 5 * scale; // x 偏移增加，模拟地图向左滑动
-  offsetY -= 5 * scale; // y 偏移增加，模拟地图向上滑动
+// 绘制路线函数
+function drawRoute() {
+  ctx.beginPath();
+  ctx.strokeStyle = "#ff6b6b"; // 路线颜色
+  ctx.lineWidth = 3;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
 
-  if (scale > 2) {
-    // 如果缩放超过2倍，重置
-    scale = 1;
-    offsetX = -500;
-    offsetY = -500;
+  // 遍历路线点，绘制曲线路径
+  for (let i = 0; i < route.length; i++) {
+    const point = route[i];
+    if (i === 0) {
+      ctx.moveTo(point.x, point.y); // 路径起点
+    } else {
+      ctx.lineTo(point.x, point.y); // 连线到下一个点
+    }
   }
+  ctx.stroke();
 
-  drawMap(); // 每帧绘制地图
-  requestAnimationFrame(animateMap); // 循环调用下一帧
+  // 在每个路径点绘制标记
+  ctx.fillStyle = "#1c7ed6"; // 路径点颜色
+  for (const point of route) {
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, 5, 0, Math.PI * 2); // 路径点圆形
+    ctx.fill();
+  }
 }
 
-// 初始化动画
-drawMap(); // 初次绘制地图
-animateMap(); // 开始动画
+// 调用绘制地图函数
+drawMap();
