@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maze Map</title>
+  <title>小郑的导航</title>
   <style>
     body {
       margin: 0;
@@ -22,11 +22,13 @@
     const canvas = document.getElementById("maze");
     const ctx = canvas.getContext("2d");
 
-    // 设置画布尺寸为 9:19.5 的宽高比
-    const mapWidth = window.innerWidth;
-    const mapHeight = mapWidth * (19.5 / 9);
-    canvas.width = mapWidth;
-    canvas.height = mapHeight;
+    // iPhone 14 Pro 屏幕的宽度
+    const iPhone14ProWidth = 2556; // 屏幕宽度（像素）
+    const iPhone14ProHeight = 1179; // 屏幕高度（像素）
+
+    // 设置画布宽度为 iPhone 14 Pro 屏幕宽度
+    canvas.width = iPhone14ProWidth;
+    canvas.height = iPhone14ProWidth * (19.5 / 9); // 高度保持 9:19.5 的宽高比
 
     // 迷宫参数
     const cols = 21; // 列数 (奇数)
