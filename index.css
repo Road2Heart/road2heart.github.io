@@ -1,10 +1,8 @@
-/* 设置页面样式 */
 body {
-  margin: 0; /* 移除默认边距 */
+  margin: 0;
   overflow: hidden; /* 隐藏滚动条 */
 }
 
-/* 画布全屏显示 */
 canvas {
-  display: block; /* 去除 canvas 下方可能的空白间距 */
+  display: block; /* 全屏显示画布 */
 }
