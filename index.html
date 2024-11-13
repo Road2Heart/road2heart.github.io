@@ -5,112 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>小郑的导航</title>
   <style>
-    body {
-      margin: 0;
-      overflow: hidden;
+    /* 设置图片自适应 */
+    img {
+      width: 100%; /* 图片宽度占满屏幕 */
+      height: auto; /* 保持图片比例 */
+      display: block; /* 移除默认的 inline 样式 */
     }
 
-    canvas {
-      display: block;
+    /* 移除页面默认的空白间距 */
+    body {
+      margin: 0;
+      padding: 0;
     }
   </style>
 </head>
 <body>
-  <canvas id="maze"></canvas>
-
-  <script>
-    const canvas = document.getElementById("maze");
-    const ctx = canvas.getContext("2d");
-
-    // iPhone 14 Pro 屏幕的宽度
-    const iPhone14ProWidth = 2556; // 屏幕宽度（像素）
-    const iPhone14ProHeight = 1179; // 屏幕高度（像素）
-
-    // 设置画布宽度为 iPhone 14 Pro 屏幕宽度
-    canvas.width = iPhone14ProWidth;
-    canvas.height = iPhone14ProWidth * (19.5 / 9); // 高度保持 9:19.5 的宽高比
-
-    // 迷宫参数
-    const cols = 21; // 列数 (奇数)
-    const rows = 15; // 行数 (奇数)
-    const cellSize = Math.min(canvas.width / cols, canvas.height / rows); // 单元格大小
-
-    // 初始化迷宫网格 (1表示墙，0表示通道)
-    const maze = Array.from({ length: rows }, () =>
-      Array.from({ length: cols }, () => 1)
-    );
-
-    // 起点和终点
-    const start = { x: 1, y: 1 }; // 起点
-    const end = { x: cols - 2, y: rows - 2 }; // 终点
-
-    // 生成迷宫
-    function generateMaze(x, y) {
-      maze[y][x] = 0; // 当前单元格设为通道
-
-      // 随机方向数组
-      const directions = [
-        [0, -2], // 上
-        [2, 0],  // 右
-        [0, 2],  // 下
-        [-2, 0], // 左
-      ].sort(() => Math.random() - 0.5);
-
-      // 遍历每个方向
-      for (const [dx, dy] of directions) {
-        const nx = x + dx; // 下一个单元格的x坐标
-        const ny = y + dy; // 下一个单元格的y坐标
-
-        // 检查下一个单元格是否在迷宫范围内且是墙
-        if (nx > 0 && nx < cols && ny > 0 && ny < rows && maze[ny][nx] === 1) {
-          maze[y + dy / 2][x + dx / 2] = 0; // 打通墙壁
-          generateMaze(nx, ny); // 递归生成迷宫
-        }
-      }
-    }
-
-    generateMaze(start.x, start.y);
-
-    // 绘制迷宫
-    function drawMaze() {
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          ctx.fillStyle = maze[y][x] === 1 ? "#343a40" : "#f8f9fa"; // 墙: 深灰，通道: 浅灰
-          ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-        }
-      }
-    }
-
-    // 绘制起点
-    function drawStart() {
-      ctx.fillStyle = "#1c7ed6"; // 蓝色
-      ctx.font = `${cellSize}px Arial`; // 增大字体大小
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("小郑", start.x * cellSize + cellSize / 2, start.y * cellSize + cellSize / 2);
-    }
-
-    // 绘制终点爱心
-    function drawEnd() {
-      const x = end.x * cellSize + cellSize / 2;
-      const y = end.y * cellSize + cellSize / 2;
-
-      ctx.fillStyle = "#ff6b6b"; // 红色
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.bezierCurveTo(x - 10, y - 10, x - 20, y + 10, x, y + 20);
-      ctx.bezierCurveTo(x + 20, y + 10, x + 10, y - 10, x, y);
-      ctx.fill();
-    }
-
-    // 绘制完整迷宫
-    function draw() {
-      drawMaze();
-      drawStart();
-      drawEnd();
-    }
-
-    draw();
-  </script>
+  <img src="image.png" alt="My Responsive PNG Image">
 </body>
 </html>
