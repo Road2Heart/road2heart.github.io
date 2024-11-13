@@ -3,23 +3,173 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>小郑的导航</title>
+  <title>导航</title>
   <style>
-    /* 设置图片自适应 */
-    img {
-      width: 100%; /* 图片宽度占满屏幕 */
-      height: auto; /* 保持图片比例 */
-      display: block; /* 移除默认的 inline 样式 */
-    }
-
-    /* 移除页面默认的空白间距 */
     body {
       margin: 0;
-      padding: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      background-color: #f4f4f4;
     }
   </style>
 </head>
 <body>
-  <img src="Navigation.png" alt="My Responsive PNG Image">
+  <canvas id="map"></canvas>
+
+  <script>
+    const canvas = document.getElementById('map');
+    const ctx = canvas.getContext('2d');
+
+    // 画布大小设为窗口的全屏
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // 起点和终点坐标
+    const start = { x: 100, y: canvas.height - 100 };
+    const end = { x: canvas.width - 100, y: 100 };
+
+    // 生成复杂路径（使用贝塞尔曲线）
+    function generateRandomRoute() {
+      const points = [start];
+      const complexity = 10 + Math.random() * 15;  // 随机复杂度
+      let lastPoint = start;
+
+      for (let i = 0; i < complexity; i++) {
+        const controlPoint1 = { 
+          x: lastPoint.x + Math.random() * 200 - 100, 
+          y: lastPoint.y + Math.random() * 200 - 100 
+        };
+        const controlPoint2 = { 
+          x: lastPoint.x + Math.random() * 200 - 100, 
+          y: lastPoint.y + Math.random() * 200 - 100 
+        };
+        const newPoint = { 
+          x: lastPoint.x + Math.random() * 200 - 100, 
+          y: lastPoint.y + Math.random() * 200 - 100 
+        };
+        points.push(controlPoint1, controlPoint2, newPoint);
+        lastPoint = newPoint;
+      }
+      points.push(end);
+      return points;
+    }
+
+    const route = generateRandomRoute();
+
+    // 绘制路径
+    function drawRoute() {
+      ctx.strokeStyle = '#007bff';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(route[0].x, route[0].y);
+      for (let i = 1; i < route.length - 2; i += 3) {
+        const controlPoint1 = route[i];
+        const controlPoint2 = route[i + 1];
+        const endPoint = route[i + 2];
+        ctx.bezierCurveTo(controlPoint1.x, controlPoint1.y, controlPoint2.x, controlPoint2.y, endPoint.x, endPoint.y);
+      }
+      ctx.stroke();
+    }
+
+    // 绘制终点爱心
+    function drawHeart(x, y) {
+      ctx.fillStyle = '#ff6b6b';
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.bezierCurveTo(x - 10, y - 10, x - 20, y + 10, x, y + 20);
+      ctx.bezierCurveTo(x + 20, y + 10, x + 10, y - 10, x, y);
+      ctx.fill();
+    }
+
+    // 小人绘制
+    const person = {
+      x: start.x,
+      y: start.y,
+      radius: 10,
+      angle: 0,
+      progress: 0,
+      speed: 0.005 // 小人行进速度
+    };
+
+    // 小人沿着路线行走的动画
+    function animatePerson() {
+      const pathLength = getPathLength(route);
+      const currentPosition = getPointOnPath(route, person.progress * pathLength);
+      person.x = currentPosition.x;
+      person.y = currentPosition.y;
+
+      // 画小人
+      ctx.beginPath();
+      ctx.arc(person.x, person.y, person.radius, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff6347'; // 小人颜色
+      ctx.fill();
+    }
+
+    // 计算路径的长度
+    function getPathLength(route) {
+      let length = 0;
+      for (let i = 1; i < route.length - 2; i += 3) {
+        const controlPoint1 = route[i];
+        const controlPoint2 = route[i + 1];
+        const endPoint = route[i + 2];
+        length += getSegmentLength(route[i-1], controlPoint1, controlPoint2, endPoint);
+      }
+      return length;
+    }
+
+    // 计算贝塞尔曲线段的长度
+    function getSegmentLength(start, control1, control2, end) {
+      let length = 0;
+      const steps = 20;
+      let prevX = start.x;
+      let prevY = start.y;
+      for (let i = 1; i <= steps; i++) {
+        const t = i / steps;
+        const x = Math.pow(1 - t, 3) * start.x + 3 * Math.pow(1 - t, 2) * t * control1.x + 3 * (1 - t) * Math.pow(t, 2) * control2.x + Math.pow(t, 3) * end.x;
+        const y = Math.pow(1 - t, 3) * start.y + 3 * Math.pow(1 - t, 2) * t * control1.y + 3 * (1 - t) * Math.pow(t, 2) * control2.y + Math.pow(t, 3) * end.y;
+        length += Math.sqrt(Math.pow(x - prevX, 2) + Math.pow(y - prevY, 2));
+        prevX = x;
+        prevY = y;
+      }
+      return length;
+    }
+
+    // 根据路径进度获取当前位置
+    function getPointOnPath(route, distance) {
+      let travelled = 0;
+      for (let i = 1; i < route.length - 2; i += 3) {
+        const controlPoint1 = route[i];
+        const controlPoint2 = route[i + 1];
+        const endPoint = route[i + 2];
+        const segmentLength = getSegmentLength(route[i-1], controlPoint1, controlPoint2, endPoint);
+        if (travelled + segmentLength >= distance) {
+          const t = (distance - travelled) / segmentLength;
+          const x = Math.pow(1 - t, 3) * route[i-1].x + 3 * Math.pow(1 - t, 2) * t * controlPoint1.x + 3 * (1 - t) * Math.pow(t, 2) * controlPoint2.x + Math.pow(t, 3) * endPoint.x;
+          const y = Math.pow(1 - t, 3) * route[i-1].y + 3 * Math.pow(1 - t, 2) * t * controlPoint1.y + 3 * (1 - t) * Math.pow(t, 2) * controlPoint2.y + Math.pow(t, 3) * endPoint.y;
+          return { x, y };
+        }
+        travelled += segmentLength;
+      }
+      return route[route.length - 1];
+    }
+
+    // 清除画布并重新绘制
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawRoute();
+      animatePerson();
+      drawHeart(end.x, end.y);
+
+      person.progress += person.speed;
+      if (person.progress > 1) person.progress = 0; // 循环动画
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
 </body>
 </html>
