@@ -3,108 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Animated Navigation</title>
+  <title>Map Animation</title>
   <style>
-    /* 全局样式 */
     body {
       margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      overflow: hidden; /* 禁止页面滚动 */
+      overflow: hidden;
     }
 
-    /* 导航菜单容器 */
-    .nav {
-      position: fixed;
-      top: 0;
-      left: -250px; /* 初始隐藏 */
-      width: 250px;
-      height: 100vh;
-      background-color: #34495e;
-      color: white;
-      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-      transition: all 0.3s ease; /* 平滑过渡动画 */
-    }
-
-    /* 导航菜单展开 */
-    .nav.active {
-      left: 0; /* 滑出到可见区域 */
-    }
-
-    /* 菜单项 */
-    .nav ul {
-      list-style: none;
-      padding: 20px;
-      margin: 0;
-    }
-
-    .nav ul li {
-      margin: 15px 0;
-    }
-
-    .nav ul li a {
-      text-decoration: none;
-      color: white;
-      font-size: 18px;
-    }
-
-    .nav ul li a:hover {
-      color: #1abc9c;
-    }
-
-    /* 菜单按钮 */
-    .menu-btn {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      width: 40px;
-      height: 40px;
-      background-color: #1abc9c;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 20px;
-      cursor: pointer;
-      z-index: 10;
-    }
-
-    /* 内容区域 */
-    .content {
-      margin: 0;
-      padding: 20px;
-      font-size: 18px;
+    canvas {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <!-- 导航按钮 -->
-  <button class="menu-btn">&#9776;</button>
-
-  <!-- 导航菜单 -->
-  <nav class="nav">
-    <ul>
-      <li><a href="#home">Home</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#services">Services</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </nav>
-
-  <!-- 主内容 -->
-  <div class="content">
-    <h1>Welcome to the Page</h1>
-    <p>Click the menu button to toggle the navigation.</p>
-  </div>
+  <canvas id="map"></canvas>
 
   <script>
-    // 获取导航菜单和按钮
-    const nav = document.querySelector('.nav');
-    const menuBtn = document.querySelector('.menu-btn');
+    const canvas = document.getElementById('map');
+    const ctx = canvas.getContext('2d');
 
-    // 切换菜单的展开和隐藏
-    menuBtn.addEventListener('click', () => {
-      nav.classList.toggle('active');
-    });
-  </script>
-</body>
-</html>
+    // 设置画布全屏
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // 模拟地图数据 (网格)
+    const gridSize = 50; // 网格大小
+    const mapWidth = 2000; // 地图宽度
+    const mapHeight = 2000; // 地图高度
+
+    // 初始地图状态
+    let offsetX = -500; // 地图的初始偏移量 (x 轴)
+    let offsetY = -500; // 地图的初始偏移量 (y 轴)
+    let scale = 1; // 初始缩放
+
+    // 绘制地图
+    function drawMap() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+
+      // 平移和缩放
+      ctx.translate(offsetX, offsetY);
+      ctx.scale(scale, scale);
+
+      // 绘制网格
+      ctx.fillStyle = "#e9ecef";
+      ctx.fillRect(0, 0, mapWidth, mapHeight);
+      ctx.strokeStyle = "#adb5bd";
+      ctx.lineWidth = 1;
+
+      for (let x = 0; x <= mapWidth; x += gridSize) {
+     
