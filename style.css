@@ -404,7 +404,7 @@ body {
   	animation:heartbeat 1s infinite;
   	-webkit-animation:heartbeat 1s infinite;
   	/* Safari 和 Chrome */
-    width:20px;
+    width:80px;
   	height:20px;
   	position:relative;
 	/*filter 定义了元素(通常是<img>)的可视效果 */
