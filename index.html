@@ -4,23 +4,22 @@
   <meta charset="UTF-8">
   <title>小0</title>
   <style type="text/css">
-    html body {
+    html, body {
       height: 100%;
-      padding: 0;
       margin: 0;
       display: flex;
       justify-content: center; /* 水平居中 */
       align-items: center; /* 垂直居中 */
       background-color: #e6e6fa; /* 浅紫色背景 */
     }
-
+    
     .Shinnosuke-container {
       width: 1000px;
       height: 1000px;
-      position: relative;
-      /* top: 50%; */
-      /* left: 30%; */
-      margin: 0 auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
     .head{
       position: relative;
