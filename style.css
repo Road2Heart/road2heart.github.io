@@ -391,7 +391,7 @@ body {
   
   .hearts{
 	  width: 180px;
-	  height: 20px;  
+	  height: 60px;  
 	  position: absolute;
 	  left: 38%;
 	  z-index: 100;
@@ -405,7 +405,7 @@ body {
   	-webkit-animation:heartbeat 1s infinite;
   	/* Safari 和 Chrome */
     width:180px;
-  	height:20px;
+  	height:60px;
   	position:relative;
 	/*filter 定义了元素(通常是<img>)的可视效果 */
   	filter:drop-shadow(0px 0px 20px rgb(255,20,20));
@@ -462,7 +462,7 @@ body {
   }
   .content{
   	width: 100%;
-  	font-size: 1.32rem;
+  	font-size: 0.32rem;
   	height:1.04rem;
   	color: #fff;
     	position:absolute;
