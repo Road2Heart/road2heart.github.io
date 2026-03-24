@@ -2,23 +2,27 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>教室排课表</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>郑老师排课表</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;padding:8px;background:#f8f9fa;font-family:system-ui}
+
 .toolbar{display:flex;justify-content:space-between;margin-bottom:10px}
 .title{font-size:18px;margin:0}
 .btn-export{background:#1677FF;color:white;border:none;padding:8px 12px;border-radius:10px}
+
 .table-box{background:white;border-radius:12px;overflow:hidden}
 .week-header-bar{display:flex;background:#fafafa}
 .time-header{width:120px;padding:10px;font-weight:bold;border-right:1px solid #eee}
 .week-header-scroll{display:flex;flex:1;overflow-x:auto}
 .week-header-item{min-width:110px;padding:10px;text-align:center;font-weight:bold;border-right:1px solid #eee}
+
 .body-row{display:flex;border-top:1px solid #eee}
 .body-row-time{width:120px;padding:8px;background:#fafafa;border-right:1px solid #eee}
 .body-row-cells{display:flex;flex:1;overflow-x:auto}
 .body-cell{min-width:110px;padding:8px;border-right:1px solid #eee}
+
 .course-item{padding:8px;border-radius:8px;margin-bottom:6px;color:white;font-size:13px}
 .room-name{font-weight:bold}
 input{width:100%;padding:6px;margin-bottom:6px;border-radius:6px;border:1px solid #ddd}
@@ -26,14 +30,16 @@ input{width:100%;padding:6px;margin-bottom:6px;border-radius:6px;border:1px soli
 </style>
 </head>
 <body>
+
 <div class="toolbar">
   <div class="title">教室排课表</div>
-  <button class="btn-export" onclick="exportExcel()">导出 Excel</button>
+  <button class="btn-export" onclick="exportExcel()">导出 Excel（带颜色）</button>
 </div>
+
 <div class="table-box">
   <div class="week-header-bar">
     <div class="time-header">时间</div>
-    <div class="week-header-scroll">
+    <div class="week-header-scroll" id="headerScroll">
       <div class="week-header-item">周一</div>
       <div class="week-header-item">周二</div>
       <div class="week-header-item">周三</div>
@@ -76,8 +82,12 @@ function render(){
     timeInput.onchange = ()=>{ times[ti] = timeInput.value.trim(); };
     timeCell.appendChild(timeInput);
     row.appendChild(timeCell);
+
     const cellsWrap = document.createElement("div");
     cellsWrap.className = "body-row-cells";
+    cellsWrap.id = "bodyScroll"+ti;
+    cellsWrap.classList.add("body-scroll");
+
     for(let wi=0;wi<7;wi++){
       const cell = document.createElement("div");
       cell.className = "body-cell";
@@ -94,7 +104,7 @@ function render(){
       iptTeacher.placeholder = "老师";
       const btn = document.createElement("button");
       btn.className = "add-btn";
-      btn.textContent = "确认";
+      btn.textContent = "确认+1";
       btn.onclick = ()=>{
         const room = iptRoom.value.trim();
         const teacher = iptTeacher.value.trim();
@@ -109,6 +119,23 @@ function render(){
     }
     row.appendChild(cellsWrap);
     body.appendChild(row);
+  });
+
+  // 全局同步滚动：动任意一行，全部一起滑
+  const header = document.getElementById("headerScroll");
+  const bodies = document.querySelectorAll(".body-scroll");
+
+  // 表头控制内容
+  header.onscroll = ()=>{
+    bodies.forEach(b => b.scrollLeft = header.scrollLeft);
+  };
+
+  // 任意一行控制所有行 + 表头
+  bodies.forEach(b=>{
+    b.onscroll = ()=>{
+      header.scrollLeft = b.scrollLeft;
+      bodies.forEach(o => o.scrollLeft = b.scrollLeft);
+    };
   });
 }
 
@@ -128,7 +155,6 @@ function exportExcel(){
       <th width="220">周日</th>
     </tr>
   `;
-
   times.forEach((time,ti)=>{
     html += `<tr style="vertical-align:top">`;
     html += `<td>${time}</td>`;
