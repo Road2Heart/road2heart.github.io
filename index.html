@@ -32,7 +32,7 @@ input{width:100%;padding:6px;margin-bottom:6px;border-radius:6px;border:1px soli
 <body>
 
 <div class="toolbar">
-  <div class="title">教室排课表</div>
+  <div class="title">排课demo</div>
   <button class="btn-export" onclick="exportExcel()">导出 Excel（带颜色）</button>
 </div>
 
@@ -86,16 +86,27 @@ function render(){
     const cellsWrap = document.createElement("div");
     cellsWrap.className = "body-row-cells";
     cellsWrap.id = "bodyScroll"+ti;
-    cellsWrap.classList.add("body-scroll");
 
     for(let wi=0;wi<7;wi++){
       const cell = document.createElement("div");
       cell.className = "body-cell";
-      data[wi][ti].forEach(item=>{
+      data[wi][ti].forEach((item,idx)=>{
         const div = document.createElement("div");
         div.className = "course-item";
         div.style.backgroundColor = getRoomColor(item.room);
         div.innerHTML = `<div class="room-name">${item.room}</div>${item.teacher}`;
+
+        // 手机长按删除（最稳）
+        div.ontouchstart = function(e){
+          this.timer = setTimeout(()=>{
+            data[wi][ti].splice(idx,1);
+            render();
+          },500)
+        };
+        div.ontouchend = function(e){
+          clearTimeout(this.timer)
+        };
+
         cell.appendChild(div);
       });
       const iptRoom = document.createElement("input");
@@ -121,22 +132,14 @@ function render(){
     body.appendChild(row);
   });
 
-  // 全局同步滚动：动任意一行，全部一起滑
   const header = document.getElementById("headerScroll");
-  const bodies = document.querySelectorAll(".body-scroll");
-
-  // 表头控制内容
-  header.onscroll = ()=>{
-    bodies.forEach(b => b.scrollLeft = header.scrollLeft);
-  };
-
-  // 任意一行控制所有行 + 表头
+  const bodies = document.querySelectorAll(".body-row-cells");
   bodies.forEach(b=>{
     b.onscroll = ()=>{
       header.scrollLeft = b.scrollLeft;
-      bodies.forEach(o => o.scrollLeft = b.scrollLeft);
-    };
-  });
+      bodies.forEach(o=>o.scrollLeft = b.scrollLeft);
+    }
+  })
 }
 
 function exportExcel(){
