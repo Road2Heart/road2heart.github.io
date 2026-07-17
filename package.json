@@ -1,0 +1,10 @@
+{
+  "name": "dating-with-me",
+  "private": true,
+  "scripts": {
+    "build": "node build-config.js"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5"
+  }
+}

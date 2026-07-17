@@ -1,5 +1,6 @@
 const card = document.querySelector('#card');
 const progress = document.querySelector('#progress');
+const FEISHU_WEBHOOK_URL = window.APP_CONFIG?.feishuWebhookUrl || '';
 
 const foods = [
   { emoji: '🍕', name: '披萨' },
@@ -23,6 +24,10 @@ const state = {
 };
 
 const noLabels = ['不要 🤔', '再想想嘛 🥺', '点不到我 😌', '真的不要？😭'];
+
+function isMobileDevice() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
 
 function getTomorrow() {
   const date = new Date();
@@ -160,6 +165,12 @@ function renderFood() {
 function renderFinal() {
   card.classList.add('final-card');
   const formattedDate = formatDate(state.date);
+  const mobileSaveExtras = isMobileDevice()
+    ? `
+      <p class="save-hint">保存时在分享面板中选择「存储图像」或「存储到照片」</p>
+      <button class="comic-button preview-save-button" id="previewSaveButton" type="button">长按保存图片</button>
+    `
+    : '';
   card.innerHTML = `
     <img class="avatar" src="assets/dog-avatar.png" alt="开心的法国斗牛犬" />
     <h1 class="title compact">真开心你没有拒绝～<br />我会准时来接你！</h1>
@@ -183,20 +194,29 @@ function renderFinal() {
         <span aria-hidden="true">⇩</span>
         <span>保存约会卡片</span>
       </button>
+      ${mobileSaveExtras}
       <p class="save-status" id="saveStatus" role="status" aria-live="polite"></p>
     </div>
   `;
 
   card.querySelector('#saveCardButton').addEventListener('click', saveInvitationCard);
+  const previewButton = card.querySelector('#previewSaveButton');
+  if (previewButton) {
+    previewButton.addEventListener('click', openPreviewSave);
+  }
   prepareSaveButton();
 }
 
 function prepareSaveButton() {
   const button = card.querySelector('#saveCardButton');
+  const previewButton = card.querySelector('#previewSaveButton');
   const status = card.querySelector('#saveStatus');
   const avatar = card.querySelector('.avatar');
   const enableSaving = () => {
     button.disabled = false;
+    if (previewButton) {
+      previewButton.disabled = false;
+    }
     status.textContent = '';
   };
 
@@ -206,6 +226,9 @@ function prepareSaveButton() {
   }
 
   button.disabled = true;
+  if (previewButton) {
+    previewButton.disabled = true;
+  }
   status.textContent = '头像加载中…';
   avatar.addEventListener('load', enableSaving, { once: true });
   avatar.addEventListener(
@@ -215,6 +238,91 @@ function prepareSaveButton() {
     },
     { once: true },
   );
+}
+
+function reportSaveEvent() {
+  if (!FEISHU_WEBHOOK_URL) {
+    return;
+  }
+
+  const formattedDate = formatDate(state.date);
+  const text = [
+    '对方保存了约会卡片！',
+    `日期：${formattedDate}`,
+    `时间：${state.time}`,
+    `餐食：${state.food}`,
+    `点「不要」次数：${state.noCount}`,
+    `保存时间：${new Date().toLocaleString('zh-CN')}`,
+  ].join('\n');
+
+  fetch(FEISHU_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      msg_type: 'text',
+      content: { text },
+    }),
+  }).catch(() => {});
+}
+
+function buildInvitationBlob() {
+  const canvas = buildInvitationCanvas();
+  const blob = dataUrlToBlob(canvas.toDataURL('image/png'));
+  const fileName = `约会卡片-${state.date}.png`;
+  const file = new File([blob], fileName, { type: 'image/png' });
+  return { blob, fileName, file };
+}
+
+function showSavePreview(blob) {
+  const url = URL.createObjectURL(blob);
+  const overlay = document.createElement('div');
+  overlay.className = 'save-preview-overlay';
+  overlay.innerHTML = `
+    <p class="save-preview-hint">长按图片，选择「存储图像」存到相册</p>
+    <img class="save-preview-image" src="${url}" alt="约会卡片预览" />
+    <button type="button" class="comic-button save-preview-close">关闭</button>
+  `;
+
+  const closePreview = () => {
+    overlay.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  overlay.querySelector('.save-preview-close').addEventListener('click', closePreview);
+  overlay.addEventListener('click', (event) => {
+    if (event.target === overlay) {
+      closePreview();
+    }
+  });
+
+  document.body.appendChild(overlay);
+}
+
+function openPreviewSave() {
+  const previewButton = card.querySelector('#previewSaveButton');
+  const status = card.querySelector('#saveStatus');
+  const avatar = card.querySelector('.avatar');
+  if (!avatar.complete || avatar.naturalWidth === 0) {
+    status.textContent = '头像加载中，请稍后再试';
+    return;
+  }
+
+  const originalContent = previewButton.innerHTML;
+  previewButton.disabled = true;
+  previewButton.textContent = '正在生成…';
+  status.textContent = '';
+
+  try {
+    const { blob } = buildInvitationBlob();
+    showSavePreview(blob);
+    status.textContent = '长按图片，选择「存储图像」存到相册';
+  } catch (error) {
+    console.error('生成约会卡片失败', error);
+    status.textContent = '保存失败，请重试';
+  } finally {
+    previewButton.disabled = false;
+    previewButton.innerHTML = originalContent;
+  }
 }
 
 function saveInvitationCard() {
@@ -231,25 +339,26 @@ function saveInvitationCard() {
   status.textContent = '';
 
   try {
-    const canvas = buildInvitationCanvas();
-    const blob = dataUrlToBlob(canvas.toDataURL('image/png'));
-    const fileName = `约会卡片-${state.date}.png`;
-    const file = new File([blob], fileName, { type: 'image/png' });
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const { blob, fileName, file } = buildInvitationBlob();
+    reportSaveEvent();
     const canShareFile =
-      isMobile &&
+      isMobileDevice() &&
       typeof navigator.share === 'function' &&
       typeof navigator.canShare === 'function' &&
       navigator.canShare({ files: [file] });
 
     if (canShareFile) {
+      status.textContent = '请在分享面板选择「存储图像」存到相册';
       navigator
         .share({ files: [file], title: '约会卡片' })
         .then(() => {
-          status.textContent = '约会卡片已准备好';
+          status.textContent = '约会卡片已保存到相册（如未看到，请用下方长按保存）';
         })
         .catch((error) => {
-          status.textContent = error.name === 'AbortError' ? '已取消保存' : '保存失败，请重试';
+          status.textContent =
+            error.name === 'AbortError'
+              ? '已取消，可点击下方「长按保存图片」'
+              : '保存失败，请用下方「长按保存图片」';
         });
     } else {
       downloadBlob(blob, fileName);
